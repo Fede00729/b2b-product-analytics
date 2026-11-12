@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_app__frontend_events
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: anonymous_id
+        tests: [not_null]
+  - name: stg_app__server_events
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: event_name
+        tests:
+          - accepted_values:
+              values: [user_signed_up, quote_request_submitted, carrier_quote_returned, policy_bound]
+  - name: stg_app__users
+    columns:
+      - name: user_id
+        tests: [unique, not_null]
+      - name: email_key
+        description: Salted SHA-256 of the email. The raw email never leaves staging.
+        tests: [not_null]
+  - name: stg_app__accounts
+    columns:
+      - name: account_id
+        tests: [unique, not_null]
+  - name: stg_crm__accounts
+    columns:
+      - name: crm_account_id
+        tests: [unique, not_null]
+      - name: domain
+        tests: [unique]

@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw files from generator/generate_events.py, loaded with `bq load`.
+    schema: quotebridge_raw
+    tables:
+      - name: frontend_events
+        description: Client-side events. anonymous_id until login, then user_id too.
+      - name: server_events
+        description: Server-side events emitted by the backend (source of truth for quotes).
+      - name: app_users
+        description: Product users. Contains emails (personal data).
+      - name: app_accounts
+        description: Agencies registered in the product.
+      - name: crm_accounts
+        description: CRM accounts. Different id, messy domains, ~10% missing.
