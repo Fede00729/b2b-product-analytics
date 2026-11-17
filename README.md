@@ -48,7 +48,7 @@ flowchart LR
 | `stg_crm__accounts` | staging | view | CRM accounts, normalized domain | ✅ |
 | `int_identity__anonymous_to_user` | intermediate | view | First user seen on each `anonymous_id` | ✅ |
 | `int_accounts__crm_matched` | intermediate | view | Product accounts matched to the CRM by domain | ✅ |
-| `int_events__unified` | intermediate | view | Client + server events in one stream | 🚧 |
+| `int_events__unified` | intermediate | view | Client + server events in one stream, pre-login events stitched to their user | ✅ |
 | `fct_quote_funnel` | marts | table | One row per quote, funnel steps and tracking loss | 🚧 |
 | `fct_account_retention` | marts | table | Weekly cohort retention | 🚧 |
 | `metric_north_star_weekly` | marts | table | Policies bound per week | 🚧 |

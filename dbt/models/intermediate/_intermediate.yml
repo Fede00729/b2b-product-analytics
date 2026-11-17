@@ -59,3 +59,64 @@ models:
       - name: is_crm_matched
         description: True when a CRM record was found for the account's domain.
         data_tests: [not_null]
+
+  - name: int_events__unified
+    description: >
+      Client and server events in one stream, one row per event. Pre-login client events
+      get their user_id from int_identity__anonymous_to_user, and every client event gets
+      the account_id of its user. Columns that only exist on one side are null on the other.
+    columns:
+      - name: event_id
+        description: Event id (message_id on the client, event_id on the server).
+        data_tests: [unique, not_null]
+      - name: event_source
+        description: Where the event was tracked.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [client, server]
+      - name: event_name
+        description: Event name, see docs/tracking_plan.md.
+        data_tests: [not_null]
+      - name: event_at
+        description: When the event happened.
+        data_tests: [not_null]
+      - name: anonymous_id
+        description: Client-side device id. Null for server events.
+      - name: user_id
+        description: >
+          Product user. Null only for client events from devices that never logged in
+          (warns instead of failing: real traffic has anonymous visitors).
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+          - relationships:
+              arguments:
+                to: ref('stg_app__users')
+                field: user_id
+      - name: account_id
+        description: Product account of the user.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_app__accounts')
+                field: account_id
+      - name: is_user_id_stitched
+        description: True when user_id came from identity stitching instead of the event itself.
+        data_tests: [not_null]
+      - name: quote_id
+        description: Quote the event belongs to, when it is part of the quote flow.
+      - name: line_of_business
+        description: Insurance line of the quote.
+      - name: carrier_id
+        description: Carrier that returned a quote. Server only.
+      - name: carriers_requested
+        description: Number of carriers the quote was sent to. Server only.
+      - name: premium_usd
+        description: Premium of the returned or bound quote, in USD. Server only.
+      - name: page_path
+        description: Page where the event happened. Client only.
+      - name: device_type
+        description: Device of the client. Client only.
