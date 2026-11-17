@@ -24,3 +24,38 @@ models:
       - name: identified_at
         description: First event where the anonymous_id appears with a user_id (usually the login).
         data_tests: [not_null]
+
+  - name: int_accounts__crm_matched
+    description: >
+      One row per product account, enriched with its CRM record when one exists.
+      The CRM uses a different id, so accounts are matched on the normalized domain.
+      Unmatched accounts are kept (left join) with null CRM fields and is_crm_matched = false.
+      The match rate is checked by tests/intermediate/assert_crm_match_rate_above_85_pct.sql.
+    columns:
+      - name: account_id
+        description: Product account (agency) id.
+        data_tests: [unique, not_null]
+      - name: domain
+        description: Normalized account domain, the join key to the CRM.
+        data_tests: [not_null]
+      - name: crm_account_id
+        description: CRM id of the matched record. Null when the account has no CRM record.
+        data_tests:
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: crm_account_id
+      - name: crm_company_name
+        description: Company name as stored in the CRM.
+      - name: crm_segment
+        description: Segment according to the CRM.
+      - name: crm_annual_revenue_usd
+        description: Annual revenue in USD according to the CRM.
+      - name: crm_account_owner
+        description: Sales rep that owns the account in the CRM.
+      - name: crm_created_date
+        description: Date the CRM record was created.
+      - name: is_crm_matched
+        description: True when a CRM record was found for the account's domain.
+        data_tests: [not_null]

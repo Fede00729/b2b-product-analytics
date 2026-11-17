@@ -50,7 +50,7 @@ dbt build --target prod                      # prod
 - [x] Tracking plan and metric definitions
 - [x] Staging models with pseudonymization and tests
 - [x] Identity stitching (`int_identity__anonymous_to_user`)
-- [ ] Product ↔ CRM account matching with a match-rate test
+- [x] Product ↔ CRM account matching with a match-rate test
 - [ ] Quote funnel and client vs server tracking loss
 - [ ] Weekly cohort retention
 - [ ] North Star weekly metric
