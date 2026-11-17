@@ -18,7 +18,7 @@ QuoteBridge lets insurance agencies request quotes from several carriers, compar
 ## Architecture
 
 ```
-generator (Python) ──► CSV ──► BigQuery (quotebridge_raw)
+generator (Python) ──► CSV ──► BigQuery (raw)
                                      │
                                      ▼  dbt
                     staging  ─►  intermediate  ─►  marts  ─►  Looker Studio
@@ -32,9 +32,9 @@ generator (Python) ──► CSV ──► BigQuery (quotebridge_raw)
 python generator/generate_events.py --accounts 120 --days 120 --seed 42
 
 # 2. Load to BigQuery (sandbox / free tier is enough)
-bq mk --location=US --dataset YOUR_GCP_PROJECT:quotebridge_raw
+bq mk --location=US --dataset YOUR_GCP_PROJECT:raw
 for t in app_accounts app_users crm_accounts frontend_events server_events; do
-  bq load --replace --autodetect --source_format=CSV quotebridge_raw.$t data/raw/$t.csv
+  bq load --replace --autodetect --source_format=CSV raw.$t data/raw/$t.csv
 done
 
 # 3. Build and test the models (dbt v2)
