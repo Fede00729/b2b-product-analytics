@@ -49,7 +49,7 @@ dbt build --target prod                      # prod
 - [x] Synthetic data generator with realistic tracking problems
 - [x] Tracking plan and metric definitions
 - [x] Staging models with pseudonymization and tests
-- [ ] Identity stitching (`int_identity__anonymous_to_user`)
+- [x] Identity stitching (`int_identity__anonymous_to_user`)
 - [ ] Product ↔ CRM account matching with a match-rate test
 - [ ] Quote funnel and client vs server tracking loss
 - [ ] Weekly cohort retention

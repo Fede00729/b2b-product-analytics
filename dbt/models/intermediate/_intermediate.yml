@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: int_identity__anonymous_to_user
+    description: >
+      Identity stitching. One row per anonymous_id that ever logged in, with the first
+      user_id seen on it, so pre-login client events can be attributed to a user.
+      Anonymous ids that never logged in are left out: there is no user to attribute them to.
+    columns:
+      - name: anonymous_id
+        description: Client-side id set on the first visit (one per browser/device).
+        data_tests: [unique, not_null]
+      - name: user_id
+        description: First product user that logged in from this anonymous_id.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_app__users')
+                field: user_id
+      - name: first_seen_at
+        description: First client event of the anonymous_id, logged in or not.
+        data_tests: [not_null]
+      - name: identified_at
+        description: First event where the anonymous_id appears with a user_id (usually the login).
+        data_tests: [not_null]
