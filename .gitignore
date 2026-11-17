@@ -6,3 +6,7 @@ profiles.yml
 .venv/
 __pycache__/
 .env
+
+# OS and editor files
+.DS_Store
+.vscode/
