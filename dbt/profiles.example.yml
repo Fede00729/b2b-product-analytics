@@ -10,7 +10,7 @@ quotebridge_analytics:
       method: service-account  # or `oauth` after `gcloud auth application-default login`
       keyfile: /absolute/path/to/service-account.json  # keep it outside the repo
       project: YOUR_GCP_PROJECT
-      dataset: quotebridge
+      dataset: dev
       location: US
       threads: 4
     prod:  # dbt build --target prod
@@ -18,6 +18,6 @@ quotebridge_analytics:
       method: service-account
       keyfile: /absolute/path/to/service-account.json
       project: YOUR_GCP_PROJECT
-      dataset: quotebridge_prod
+      dataset: prod
       location: US
       threads: 4
