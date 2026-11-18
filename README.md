@@ -73,6 +73,7 @@ done
 
 # 3. Build and test the models
 cd dbt
+uv run dbt deps                   # install dbt packages (dbt_utils)
 uv run dbt debug
 uv run dbt build                  # dev
 uv run dbt build --target prod    # prod
