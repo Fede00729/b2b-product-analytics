@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: fct_quote_funnel
+    description: >
+      One row per quote, with the timestamp of each funnel step:
+      form started -> submit clicked (client) -> submitted (server) -> first carrier return -> bound.
+      Server events are the source of truth; is_client_submit_lost measures client-side tracking loss.
+      policy_bound carries no carrier or premium, so the winning carrier is unknown.
+    columns:
+      - name: quote_id
+        description: Quote id, created when the quote form is opened.
+        data_tests: [unique, not_null]
+      - name: account_id
+        description: Product account that requested the quote.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_app__accounts')
+                field: account_id
+      - name: user_id
+        description: User that requested the quote.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_app__users')
+                field: user_id
+      - name: line_of_business
+        description: Insurance line of the quote.
+      - name: form_started_at
+        description: Quote form opened (client).
+      - name: submit_clicked_at
+        description: Submit button clicked (client). Null when the client event was lost.
+      - name: submitted_at
+        description: Quote request persisted (server). Null when the quote was abandoned.
+      - name: first_carrier_return_at
+        description: First carrier price returned (server).
+      - name: bound_at
+        description: Policy bound (server).
+      - name: carriers_requested
+        description: Number of carriers the quote was sent to.
+      - name: carrier_quotes_returned
+        description: Number of carrier prices returned. Never above carriers_requested.
+      - name: hours_to_first_return
+        description: Hours from submit to the first carrier price.
+      - name: days_to_bind
+        description: >
+          Days from submit to bind. Known issue: about 6% of bound quotes are bound before
+          their first carrier return (see tests/marts/assert_quote_bound_after_first_carrier_return.sql).
+      - name: is_submitted
+        description: The server received the quote request.
+        data_tests: [not_null]
+      - name: has_carrier_response
+        description: At least one carrier returned a price.
+        data_tests: [not_null]
+      - name: is_bound
+        description: The quote ended in a bound policy (North Star).
+        data_tests: [not_null]
+      - name: is_client_submit_lost
+        description: Submitted on the server but the client submit click was never tracked.
+        data_tests: [not_null]
