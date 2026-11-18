@@ -93,5 +93,9 @@ The generated CSVs are not in the repo (they're in `.gitignore`). The same `--se
 - [x] Quote funnel and client vs server tracking loss
 - [x] Weekly cohort retention
 - [x] North Star weekly metric
-- [ ] Looker Studio dashboard + screenshots
+- [x] Production build (`dbt build --target prod` → `staging`, `intermediate`, `marts`)
+- [ ] dbt docs site on GitHub Pages (models, tests and column-level lineage)
+- [ ] Executive dashboard in Looker Studio (one page: KPIs, North Star trend, funnel, retention)
+- [ ] Data & Analytics team dashboard in Looker Studio (Overview, Funnel, Retention & accounts)
+- [ ] CI with GitHub Actions: build and test on every push, weekly rebuild so the sandbox tables never expire
 - [ ] Data quality table for a QA dashboard (test warnings as rows)
