@@ -1,37 +1,71 @@
 name: dbt
 
 on:
-  pull_request:        # every PR: build and test in the ci_* datasets
-  workflow_dispatch:   # manual "Run workflow" button
+  pull_request:            # every PR: build and test in the ci_* datasets
+  push:
+    branches: [main]       # every merge to main: rebuild prod
+  schedule:
+    - cron: '17 6 * * 1'   # Mondays 06:17 UTC: rebuild prod so sandbox tables never expire
+  workflow_dispatch:       # manual "Run workflow" button
 
 permissions:
-  contents: read       # read the repo
-  id-token: write      # request the OIDC token that Workload Identity Federation exchanges
+  contents: read           # read the repo
+  id-token: write          # request the OIDC token that Workload Identity Federation exchanges
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
 
 jobs:
-  build:
+  ci:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    env:
-      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
     defaults:
       run:
         working-directory: dbt
     steps:
       - uses: actions/checkout@v6
-
       - uses: astral-sh/setup-uv@v7
-
       - name: Install dbt
         run: uv sync --locked
-
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-
       - name: Install dbt packages
         run: uv run dbt deps
-
       - name: Build and test (ci_* datasets)
         run: uv run dbt build --profiles-dir ci --target ci
+
+  prod:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency: prod      # never two prod runs at the same time
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Install dbt
+        run: uv sync --locked
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      - name: Set up gcloud and bq
+        uses: google-github-actions/setup-gcloud@v3
+      - name: Generate synthetic data
+        run: uv run python generator/generate_events.py --accounts 120 --days 120 --seed 42
+      - name: Load raw data to BigQuery
+        run: |
+          bq --project_id=${GCP_PROJECT_ID} mk -f --location=US --dataset ${GCP_PROJECT_ID}:raw
+          for t in app_accounts app_users crm_accounts frontend_events server_events; do
+            bq --project_id=${GCP_PROJECT_ID} load --replace --autodetect --source_format=CSV raw.${t} data/raw/${t}.csv
+          done
+      - name: Install dbt packages
+        run: uv run dbt deps
+        working-directory: dbt
+      - name: Build and test prod
+        run: uv run dbt build --profiles-dir ci --target prod --vars "pii_salt: ${PII_SALT}"
+        working-directory: dbt
+        env:
+          PII_SALT: ${{ secrets.PII_SALT }}
