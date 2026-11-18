@@ -1,0 +1,19 @@
+# Profile used by GitHub Actions (see .github/workflows/).
+# No secrets here: credentials come from Workload Identity Federation.
+quotebridge_analytics:
+  target: ci
+  outputs:
+    ci:  # pull requests: builds into ci_staging, ci_intermediate, ci_marts
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: ci
+      location: US
+      threads: 4
+    prod:  # main and the weekly run: builds into staging, intermediate, marts
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: prod
+      location: US
+      threads: 4
