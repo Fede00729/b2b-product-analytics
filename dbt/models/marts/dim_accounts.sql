@@ -3,6 +3,7 @@ with accounts as (
 ),
 
 users as (
+    {# staging, not intermediate: only a clean count per account, no reusable logic #}
     select * from {{ ref('stg_app__users') }}
 ),
 
