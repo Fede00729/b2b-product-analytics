@@ -159,3 +159,63 @@ models:
         data_tests:
           - dbt_utils.accepted_range:
               arguments: {min_value: 0, max_value: 1}
+
+  - name: dim_accounts
+    description: >
+      One row per product account, including accounts that never submitted a quote.
+      Product and CRM attributes plus lifetime activity. Recency is measured against
+      the end of the data (last submitted quote), not today's date.
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "policies_bound <= quotes_submitted and quotes_submitted <= quotes_started"
+    columns:
+      - name: account_id
+        description: Product account id.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_app__accounts')
+                field: account_id
+      - name: account_name
+        description: Agency name in the product.
+      - name: domain
+        description: Normalized account domain.
+      - name: segment
+        description: Account segment according to the product.
+      - name: created_at
+        description: When the product account was created.
+      - name: is_crm_matched
+        description: True when the account has a CRM record.
+        data_tests: [not_null]
+      - name: crm_account_id
+        description: CRM id. Null when the account has no CRM record.
+      - name: crm_company_name
+        description: Company name in the CRM.
+      - name: crm_segment
+        description: Segment according to the CRM.
+      - name: crm_annual_revenue_usd
+        description: Annual revenue in USD according to the CRM.
+      - name: crm_account_owner
+        description: Sales rep that owns the account in the CRM.
+      - name: users
+        description: Product users of the account.
+        data_tests: [not_null]
+      - name: quotes_started
+        description: Quote forms opened by the account, all time.
+        data_tests: [not_null]
+      - name: quotes_submitted
+        description: Quotes submitted by the account, all time.
+        data_tests: [not_null]
+      - name: policies_bound
+        description: Policies bound by the account, all time.
+        data_tests: [not_null]
+      - name: first_quote_submitted_at
+        description: First quote submitted. Null if the account never submitted one.
+      - name: last_quote_submitted_at
+        description: Last quote submitted. Null if the account never submitted one.
+      - name: is_active_last_4_weeks
+        description: Submitted at least one quote in the 28 days before the end of the data.
+        data_tests: [not_null]

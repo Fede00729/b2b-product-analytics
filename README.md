@@ -52,7 +52,7 @@ flowchart LR
 | `fct_quote_funnel` | marts | table | One row per quote, funnel steps and tracking loss | ✅ |
 | `fct_account_retention` | marts | table | Weekly cohort retention, one row per cohort and week | ✅ |
 | `metric_north_star_weekly` | marts | table | Policies bound per week (North Star) and supporting metrics | ✅ |
-| `dim_accounts` | marts | table | One row per account, with CRM fields | 🚧 |
+| `dim_accounts` | marts | table | One row per account: product and CRM attributes plus lifetime activity | ✅ |
 
 All models have descriptions and tests: generic ones (`unique`, `not_null`, `relationships`), row rules with [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) (`unique_combination_of_columns`, `accepted_range`, `expression_is_true`), and singular tests for business rules (CRM match rate ≥ 85%, funnel steps in order).
 
