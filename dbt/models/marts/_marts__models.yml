@@ -7,6 +7,17 @@ models:
       form started -> submit clicked (client) -> submitted (server) -> first carrier return -> bound.
       Server events are the source of truth; is_client_submit_lost measures client-side tracking loss.
       policy_bound carries no carrier or premium, so the winning carrier is unknown.
+      Funnel step order is checked by tests/marts/assert_quote_funnel_steps_in_order.sql.
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "carrier_quotes_returned <= carriers_requested"
+      # known data quality issue: warns so it stays visible without blocking the build
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "bound_at >= first_carrier_return_at"
+          config:
+            severity: warn
     columns:
       - name: quote_id
         description: Quote id, created when the quote form is opened.
@@ -47,7 +58,7 @@ models:
       - name: days_to_bind
         description: >
           Days from submit to bind. Known issue: about 6% of bound quotes are bound before
-          their first carrier return (see tests/marts/assert_quote_bound_after_first_carrier_return.sql).
+          their first carrier return (warning test on this model).
       - name: is_submitted
         description: The server received the quote request.
         data_tests: [not_null]
@@ -66,8 +77,20 @@ models:
       Weekly cohort retention of accounts. An account is active in a week (Monday to Sunday)
       when it submitted at least one quote; its cohort is its first active week.
       One row per cohort and week since the first one, up to the last complete week of data,
-      so weeks without activity show 0. Grain and rates are checked by
-      tests/marts/assert_account_retention_is_consistent.sql.
+      so weeks without activity show 0.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [cohort_week, weeks_since_first]
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "active_accounts <= cohort_size"
+      # by definition, every account of a cohort is active in its cohort week
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "retention_rate = 1"
+          config:
+            where: "weeks_since_first = 0"
     columns:
       - name: cohort_week
         description: Monday of the account's first active week.
@@ -86,4 +109,9 @@ models:
         data_tests: [not_null]
       - name: retention_rate
         description: active_accounts / cohort_size, between 0 and 1.
-        data_tests: [not_null]
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1

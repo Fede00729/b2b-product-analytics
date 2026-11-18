@@ -54,7 +54,7 @@ flowchart LR
 | `metric_north_star_weekly` | marts | table | Policies bound per week | 🚧 |
 | `dim_accounts` | marts | table | One row per account, with CRM fields | 🚧 |
 
-All models have descriptions and tests (`unique`, `not_null`, `relationships`, plus singular tests: CRM match rate ≥ 85%, funnel steps in order and a consistent retention table).
+All models have descriptions and tests: generic ones (`unique`, `not_null`, `relationships`), row rules with [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) (`unique_combination_of_columns`, `accepted_range`, `expression_is_true`), and singular tests for business rules (CRM match rate ≥ 85%, funnel steps in order).
 
 Datasets are split by environment: `dev` builds into `dev_staging`, `dev_intermediate` and `dev_marts`; `prod` builds into `staging`, `intermediate` and `marts`.
 
