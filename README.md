@@ -1,5 +1,6 @@
 # B2B product analytics: QuoteBridge
 
+[![CI](https://github.com/Fede00729/b2b-product-analytics/actions/workflows/dbt.yml/badge.svg)](https://github.com/Fede00729/b2b-product-analytics/actions/workflows/dbt.yml)
 [![dbt](https://img.shields.io/badge/dbt-v2.0.12-FF694B?logo=dbt&logoColor=white)](https://www.getdbt.com/)
 [![BigQuery](https://img.shields.io/badge/BigQuery-sandbox-4285F4?logo=googlebigquery&logoColor=white)](https://cloud.google.com/bigquery)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -58,6 +59,8 @@ All models have descriptions and tests: generic ones (`unique`, `not_null`, `rel
 
 Datasets are split by environment: `dev` builds into `dev_staging`, `dev_intermediate` and `dev_marts`; `prod` builds into `staging`, `intermediate` and `marts`.
 
+Full docs (models, columns, tests and column-level lineage): https://fede00729.github.io/b2b-product-analytics/
+
 ## Run it
 
 ```bash
@@ -94,8 +97,8 @@ The generated CSVs are not in the repo (they're in `.gitignore`). The same `--se
 - [x] Weekly cohort retention
 - [x] North Star weekly metric
 - [x] Production build (`dbt build --target prod` → `staging`, `intermediate`, `marts`)
-- [ ] dbt docs site on GitHub Pages (models, tests and column-level lineage)
+- [x] dbt docs site on GitHub Pages (models, tests and column-level lineage)
 - [ ] Executive dashboard in Looker Studio (one page: KPIs, North Star trend, funnel, retention)
 - [ ] Data & Analytics team dashboard in Looker Studio (Overview, Funnel, Retention & accounts)
-- [ ] CI with GitHub Actions: build and test on every push, weekly rebuild so the sandbox tables never expire
+- [x] CI with GitHub Actions: build and test on every push, weekly rebuild so the sandbox tables never expire
 - [ ] Data quality table for a QA dashboard (test warnings as rows)
