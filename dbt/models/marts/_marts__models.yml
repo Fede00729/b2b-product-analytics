@@ -60,3 +60,30 @@ models:
       - name: is_client_submit_lost
         description: Submitted on the server but the client submit click was never tracked.
         data_tests: [not_null]
+
+  - name: fct_account_retention
+    description: >
+      Weekly cohort retention of accounts. An account is active in a week (Monday to Sunday)
+      when it submitted at least one quote; its cohort is its first active week.
+      One row per cohort and week since the first one, up to the last complete week of data,
+      so weeks without activity show 0. Grain and rates are checked by
+      tests/marts/assert_account_retention_is_consistent.sql.
+    columns:
+      - name: cohort_week
+        description: Monday of the account's first active week.
+        data_tests: [not_null]
+      - name: weeks_since_first
+        description: Weeks since the cohort week (0 = the cohort week itself).
+        data_tests: [not_null]
+      - name: activity_week
+        description: Monday of the week being measured (cohort_week + weeks_since_first).
+        data_tests: [not_null]
+      - name: cohort_size
+        description: Accounts whose first active week is cohort_week.
+        data_tests: [not_null]
+      - name: active_accounts
+        description: Accounts of the cohort that submitted at least one quote in activity_week.
+        data_tests: [not_null]
+      - name: retention_rate
+        description: active_accounts / cohort_size, between 0 and 1.
+        data_tests: [not_null]

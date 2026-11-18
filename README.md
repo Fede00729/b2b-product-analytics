@@ -50,11 +50,11 @@ flowchart LR
 | `int_accounts__crm_matched` | intermediate | view | Product accounts matched to the CRM by domain | ✅ |
 | `int_events__unified` | intermediate | view | Client + server events in one stream, pre-login events stitched to their user | ✅ |
 | `fct_quote_funnel` | marts | table | One row per quote, funnel steps and tracking loss | ✅ |
-| `fct_account_retention` | marts | table | Weekly cohort retention | 🚧 |
+| `fct_account_retention` | marts | table | Weekly cohort retention, one row per cohort and week | ✅ |
 | `metric_north_star_weekly` | marts | table | Policies bound per week | 🚧 |
 | `dim_accounts` | marts | table | One row per account, with CRM fields | 🚧 |
 
-All models have descriptions and tests (`unique`, `not_null`, `relationships`, plus singular tests: CRM match rate ≥ 85% and funnel steps in a consistent order).
+All models have descriptions and tests (`unique`, `not_null`, `relationships`, plus singular tests: CRM match rate ≥ 85%, funnel steps in order and a consistent retention table).
 
 Datasets are split by environment: `dev` builds into `dev_staging`, `dev_intermediate` and `dev_marts`; `prod` builds into `staging`, `intermediate` and `marts`.
 
@@ -90,7 +90,7 @@ The generated CSVs are not in the repo (they're in `.gitignore`). The same `--se
 - [x] Identity stitching (`int_identity__anonymous_to_user`)
 - [x] Product ↔ CRM account matching with a match-rate test
 - [x] Quote funnel and client vs server tracking loss
-- [ ] Weekly cohort retention
+- [x] Weekly cohort retention
 - [ ] North Star weekly metric
 - [ ] Looker Studio dashboard + screenshots
 - [ ] Data quality table for a QA dashboard (test warnings as rows)
