@@ -93,3 +93,4 @@ The generated CSVs are not in the repo (they're in `.gitignore`). The same `--se
 - [ ] Weekly cohort retention
 - [ ] North Star weekly metric
 - [ ] Looker Studio dashboard + screenshots
+- [ ] Data quality table for a QA dashboard (test warnings as rows)
