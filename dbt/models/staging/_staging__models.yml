@@ -2,34 +2,119 @@ version: 2
 
 models:
   - name: stg_app__frontend_events
+    description: >
+      Client-side events, one row per event. Before login only anonymous_id is set;
+      after login user_id too. Some events never arrive (ad blockers, closed tabs).
     columns:
       - name: event_id
+        description: Event id (message_id in the raw data).
         data_tests: [unique, not_null]
       - name: anonymous_id
+        description: Device id set on the first visit.
         data_tests: [not_null]
+      - name: user_id
+        description: Product user. Null before login (empty strings are turned into null).
+      - name: event_name
+        description: Event name, see docs/tracking_plan.md.
+      - name: event_at
+        description: When the event happened.
+      - name: page_path
+        description: Page where the event happened.
+      - name: device_type
+        description: Device of the client.
+      - name: quote_id
+        description: Quote the event belongs to, read from the properties JSON.
+      - name: line_of_business
+        description: Insurance line of the quote, read from the properties JSON.
+      - name: event_source
+        description: Always 'client'. Lets the unified event stream tell both sides apart.
+
   - name: stg_app__server_events
+    description: >
+      Server-side events, one row per event. The source of truth for quotes:
+      submitted, carrier returns and binds are tracked here.
     columns:
       - name: event_id
+        description: Event id.
         data_tests: [unique, not_null]
+      - name: user_id
+        description: Product user that triggered the event.
+      - name: account_id
+        description: Product account of the user.
       - name: event_name
+        description: Event name, see docs/tracking_plan.md.
         data_tests:
           - accepted_values:
               arguments:
                 values: [user_signed_up, quote_request_submitted, carrier_quote_returned, policy_bound]
+      - name: event_at
+        description: When the event happened.
+      - name: quote_id
+        description: Quote the event belongs to, read from the properties JSON.
+      - name: line_of_business
+        description: Insurance line of the quote.
+      - name: carrier_id
+        description: Carrier that returned a price (carrier_quote_returned only).
+      - name: carriers_requested
+        description: Number of carriers the quote was sent to (quote_request_submitted only).
+      - name: premium_usd
+        description: Premium of the returned price, in USD (carrier_quote_returned only).
+      - name: event_source
+        description: Always 'server'.
+
   - name: stg_app__users
+    description: >
+      Product users, one row per user. The email is pseudonymized here and dropped:
+      only its salted hash and its domain reach the next layers.
     columns:
       - name: user_id
+        description: Product user id.
         data_tests: [unique, not_null]
+      - name: account_id
+        description: Account (agency) the user belongs to.
       - name: email_key
         description: Salted SHA-256 of the email. The raw email never leaves staging.
         data_tests: [not_null]
+      - name: email_domain
+        description: Normalized domain of the email.
+      - name: role
+        description: Role of the user in the agency.
+      - name: signed_up_at
+        description: When the user signed up.
+
   - name: stg_app__accounts
+    description: Product accounts (insurance agencies), one row per account.
     columns:
       - name: account_id
+        description: Product account id.
         data_tests: [unique, not_null]
+      - name: account_name
+        description: Agency name.
+      - name: domain
+        description: Normalized domain (lowercase, trimmed, without www.). Join key to the CRM.
+      - name: segment
+        description: Account segment (small, mid_market, enterprise).
+      - name: created_at
+        description: When the account was created.
+
   - name: stg_crm__accounts
+    description: >
+      CRM accounts, one row per CRM record. The CRM uses its own id and messy domains,
+      so it is matched to product accounts on the normalized domain.
     columns:
       - name: crm_account_id
+        description: CRM id, cast to string (it loads as INT64).
         data_tests: [unique, not_null]
+      - name: company_name
+        description: Company name, capitalized.
       - name: domain
+        description: Normalized website domain. Join key to product accounts.
         data_tests: [unique]
+      - name: crm_segment
+        description: Segment according to the CRM.
+      - name: annual_revenue_usd
+        description: Annual revenue in USD.
+      - name: account_owner
+        description: Sales rep that owns the account.
+      - name: crm_created_date
+        description: Date the CRM record was created.

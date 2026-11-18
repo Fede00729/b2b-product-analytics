@@ -35,9 +35,15 @@ models:
       - name: account_id
         description: Product account (agency) id.
         data_tests: [unique, not_null]
+      - name: account_name
+        description: Agency name in the product.
       - name: domain
         description: Normalized account domain, the join key to the CRM.
         data_tests: [not_null]
+      - name: segment
+        description: Account segment according to the product.
+      - name: created_at
+        description: When the product account was created.
       - name: crm_account_id
         description: CRM id of the matched record. Null when the account has no CRM record.
         data_tests:
