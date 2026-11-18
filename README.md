@@ -51,7 +51,7 @@ flowchart LR
 | `int_events__unified` | intermediate | view | Client + server events in one stream, pre-login events stitched to their user | ✅ |
 | `fct_quote_funnel` | marts | table | One row per quote, funnel steps and tracking loss | ✅ |
 | `fct_account_retention` | marts | table | Weekly cohort retention, one row per cohort and week | ✅ |
-| `metric_north_star_weekly` | marts | table | Policies bound per week | 🚧 |
+| `metric_north_star_weekly` | marts | table | Policies bound per week (North Star) and supporting metrics | ✅ |
 | `dim_accounts` | marts | table | One row per account, with CRM fields | 🚧 |
 
 All models have descriptions and tests: generic ones (`unique`, `not_null`, `relationships`), row rules with [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) (`unique_combination_of_columns`, `accepted_range`, `expression_is_true`), and singular tests for business rules (CRM match rate ≥ 85%, funnel steps in order).
@@ -92,6 +92,6 @@ The generated CSVs are not in the repo (they're in `.gitignore`). The same `--se
 - [x] Product ↔ CRM account matching with a match-rate test
 - [x] Quote funnel and client vs server tracking loss
 - [x] Weekly cohort retention
-- [ ] North Star weekly metric
+- [x] North Star weekly metric
 - [ ] Looker Studio dashboard + screenshots
 - [ ] Data quality table for a QA dashboard (test warnings as rows)

@@ -115,3 +115,47 @@ models:
               arguments:
                 min_value: 0
                 max_value: 1
+
+  - name: metric_north_star_weekly
+    description: >
+      One row per week (Monday to Sunday) with the North Star and its supporting metrics,
+      up to the last complete week of data; weeks without activity show 0.
+      Counts use the week each thing happened. Rates use one group of quotes for both
+      numerator and denominator: quotes submitted that week (or started, for quote_submit_rate).
+      Definitions in docs/metrics.md.
+    columns:
+      - name: week_start
+        description: Monday of the week.
+        data_tests: [unique, not_null]
+      - name: policies_bound
+        description: "North Star: policies bound through the platform in the week."
+        data_tests: [not_null]
+      - name: weekly_active_accounts
+        description: Accounts with at least one quote submitted in the week.
+        data_tests: [not_null]
+      - name: quotes_started
+        description: Quote forms opened in the week.
+        data_tests: [not_null]
+      - name: quotes_submitted
+        description: Quotes submitted in the week (server).
+        data_tests: [not_null]
+      - name: quote_submit_rate
+        description: Share of the quotes started in the week that were ever submitted.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+      - name: carrier_response_rate
+        description: Carrier prices returned / carriers requested, for quotes submitted in the week.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+      - name: bind_rate
+        description: Share of the week's submitted quotes with a carrier response that ended bound.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments: {min_value: 0, max_value: 1}
+      - name: client_tracking_loss
+        description: Share of the week's submitted quotes whose client submit click was never tracked.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments: {min_value: 0, max_value: 1}
