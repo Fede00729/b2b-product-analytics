@@ -10,3 +10,7 @@ __pycache__/
 # OS and editor files
 .DS_Store
 .vscode/
+
+# CI
+!dbt/ci/profiles.yml
+.user.yml

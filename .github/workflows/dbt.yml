@@ -1,0 +1,37 @@
+name: dbt
+
+on:
+  pull_request:        # every PR: build and test in the ci_* datasets
+  workflow_dispatch:   # manual "Run workflow" button
+
+permissions:
+  contents: read       # read the repo
+  id-token: write      # request the OIDC token that Workload Identity Federation exchanges
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+    defaults:
+      run:
+        working-directory: dbt
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install dbt
+        run: uv sync --locked
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Install dbt packages
+        run: uv run dbt deps
+
+      - name: Build and test (ci_* datasets)
+        run: uv run dbt build --profiles-dir ci --target ci
