@@ -65,7 +65,8 @@ jobs:
         run: uv run dbt deps
         working-directory: dbt
       - name: Build and test prod
-        run: uv run dbt build --profiles-dir ci --target prod --vars "pii_salt: ${PII_SALT}"
+        run: |
+          uv run dbt build --profiles-dir ci --target prod --vars "pii_salt: ${PII_SALT}"
         working-directory: dbt
         env:
           PII_SALT: ${{ secrets.PII_SALT }}
