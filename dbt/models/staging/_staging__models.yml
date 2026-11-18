@@ -66,6 +66,8 @@ models:
     description: >
       Product users, one row per user. The email is pseudonymized here and dropped:
       only its salted hash and its domain reach the next layers.
+      Materialized as a table (not a view) so the pseudonymization salt (var `pii_salt`)
+      never gets stored in a view definition.
     columns:
       - name: user_id
         description: Product user id.

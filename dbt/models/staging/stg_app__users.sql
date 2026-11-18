@@ -1,3 +1,9 @@
+{#
+    Table, not view: a view stores its compiled SQL, and pseudonymize()
+    writes the pseudonymization salt (var pii_salt) into it as a literal.
+#}
+{{ config(materialized='table') }}
+
 with source as (
     select * from {{ source('raw', 'app_users') }}
 )

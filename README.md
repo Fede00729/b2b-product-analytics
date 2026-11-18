@@ -15,7 +15,7 @@ QuoteBridge lets insurance agencies request quotes from several carriers, compar
 
 - **Event tracking design:** a [tracking plan](docs/tracking_plan.md) with client-side and server-side events.
 - **Identity resolution:** stitching `anonymous_id` → `user_id`, and matching product accounts to CRM accounts that use a different id and messy domains.
-- **Pseudonymization:** emails are hashed with a salted SHA-256 in staging; no raw personal data reaches the marts.
+- **Pseudonymization:** emails are hashed with a secret-keyed SHA-256 in staging; no raw personal data reaches the marts ([why and how](docs/pseudonymization.md)).
 - **Modeling in dbt:** staging → intermediate → marts, with tests and documentation.
 - **Product metrics:** North Star, funnel, cohort retention ([definitions](docs/metrics.md)).
 - **Dashboard:** Looker Studio on top of the marts.
