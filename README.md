@@ -43,7 +43,7 @@ flowchart LR
 | Model | Layer | Type | What it is | Status |
 |---|---|---|---|---|
 | `stg_app__accounts` | staging | view | Product accounts (agencies), normalized domain | ✅ |
-| `stg_app__users` | staging | view | Users, email replaced by a salted hash | ✅ |
+| `stg_app__users` | staging | table | Users, email replaced by a salted hash (a table so the salt is not stored in a view) | ✅ |
 | `stg_app__frontend_events` | staging | view | Client-side events | ✅ |
 | `stg_app__server_events` | staging | view | Server-side events, source of truth for quotes | ✅ |
 | `stg_crm__accounts` | staging | view | CRM accounts, normalized domain | ✅ |
