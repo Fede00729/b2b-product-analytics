@@ -19,7 +19,7 @@ QuoteBridge lets insurance agencies request quotes from several carriers, compar
 - **Pseudonymization:** emails are hashed with a secret-keyed SHA-256 in staging; no raw personal data reaches the marts ([why and how](docs/pseudonymization.md)).
 - **Modeling in dbt:** staging → intermediate → marts, with tests and documentation.
 - **Product metrics:** North Star, funnel, cohort retention ([definitions](docs/metrics.md)).
-- **Dashboard:** Looker Studio on top of the marts.
+- **Dashboard:** an [executive summary](#dashboard) in Looker Studio on top of the marts.
 
 ## Architecture
 
@@ -43,7 +43,7 @@ flowchart LR
 | Model | Layer | Type | What it is | Status |
 |---|---|---|---|---|
 | `stg_app__accounts` | staging | view | Product accounts (agencies), normalized domain | ✅ |
-| `stg_app__users` | staging | view | Users, email replaced by a salted hash | ✅ |
+| `stg_app__users` | staging | table | Users, email replaced by a salted hash (a table so the salt is not stored in a view) | ✅ |
 | `stg_app__frontend_events` | staging | view | Client-side events | ✅ |
 | `stg_app__server_events` | staging | view | Server-side events, source of truth for quotes | ✅ |
 | `stg_crm__accounts` | staging | view | CRM accounts, normalized domain | ✅ |
@@ -60,6 +60,16 @@ All models have descriptions and tests: generic ones (`unique`, `not_null`, `rel
 Datasets are split by environment: `dev` builds into `dev_staging`, `dev_intermediate` and `dev_marts`; `prod` builds into `staging`, `intermediate` and `marts`.
 
 Full docs (models, columns, tests and column-level lineage): https://fede00729.github.io/b2b-product-analytics/
+
+## Dashboard
+
+[Executive summary](https://datastudio.google.com/reporting/37242ab6-7959-4043-a49d-698709718ea6) in Looker Studio (now Data Studio), built on the prod marts and open to anyone with the link.
+
+<a href="https://datastudio.google.com/reporting/37242ab6-7959-4043-a49d-698709718ea6"><img src="docs/images/executive-dashboard.png" alt="QuoteBridge executive dashboard" width="600"></a>
+
+- **KPIs:** North Star (policies bound), weekly active accounts, quotes submitted and bind rate for the last 4 complete weeks, compared with the previous 4.
+- **North Star trend** next to weekly active accounts: since late September both fall together while conversion rates stay flat, so the drop comes from accounts going inactive, not from the funnel.
+- **Quote funnel** for the quotes started in the period, and **weekly cohort retention** (cohorts with 5+ accounts).
 
 ## Run it
 
@@ -98,7 +108,7 @@ The generated CSVs are not in the repo (they're in `.gitignore`). The same `--se
 - [x] North Star weekly metric
 - [x] Production build (`dbt build --target prod` → `staging`, `intermediate`, `marts`)
 - [x] dbt docs site on GitHub Pages (models, tests and column-level lineage)
-- [ ] Executive dashboard in Looker Studio (one page: KPIs, North Star trend, funnel, retention)
+- [x] Executive dashboard in Looker Studio (one page: KPIs, North Star trend, funnel, retention)
 - [ ] Data & Analytics team dashboard in Looker Studio (Overview, Funnel, Retention & accounts)
 - [x] CI with GitHub Actions: build and test on every push, weekly rebuild so the sandbox tables never expire
 - [ ] Data quality table for a QA dashboard (test warnings as rows)
