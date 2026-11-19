@@ -1,22 +1,28 @@
 # Add this block to ~/.dbt/profiles.yml and fill in your GCP project.
 # BigQuery sandbox (free tier) is enough for this project.
-# The identity needs roles/bigquery.dataEditor, roles/bigquery.jobUser and
-# roles/bigquery.readSessionUser (dbt v2 reads results through the Storage Read API).
+#
+# Auth: your Google login impersonates a service account, so no key file is stored.
+#   1. Service account roles: roles/bigquery.dataEditor, roles/bigquery.jobUser and
+#      roles/bigquery.readSessionUser (dbt v2 reads results through the Storage Read API).
+#   2. Your user needs roles/iam.serviceAccountTokenCreator on that service account.
+#   3. gcloud auth application-default login
+# dbt v2 ignores CLOUDSDK_CONFIG: to keep these credentials apart from another account,
+# point GOOGLE_APPLICATION_CREDENTIALS to the file step 3 writes.
 quotebridge_analytics:
   target: dev
   outputs:
     dev:
       type: bigquery
-      method: service-account  # or `oauth` after `gcloud auth application-default login`
-      keyfile: /absolute/path/to/service-account.json  # keep it outside the repo
+      method: oauth
+      impersonate_service_account: YOUR_SERVICE_ACCOUNT@YOUR_GCP_PROJECT.iam.gserviceaccount.com
       project: YOUR_GCP_PROJECT
       dataset: dev
       location: US
       threads: 4
     prod:  # dbt build --target prod
       type: bigquery
-      method: service-account
-      keyfile: /absolute/path/to/service-account.json
+      method: oauth
+      impersonate_service_account: YOUR_SERVICE_ACCOUNT@YOUR_GCP_PROJECT.iam.gserviceaccount.com
       project: YOUR_GCP_PROJECT
       dataset: prod
       location: US

@@ -92,7 +92,7 @@ uv run dbt build                  # dev
 uv run dbt build --target prod    # prod
 ```
 
-dbt looks for a profile called `quotebridge_analytics` in `~/.dbt/profiles.yml`. Copy the block from [`dbt/profiles.example.yml`](dbt/profiles.example.yml) and set your GCP project.
+dbt looks for a profile called `quotebridge_analytics` in `~/.dbt/profiles.yml`. Copy the block from [`dbt/profiles.example.yml`](dbt/profiles.example.yml) and set your GCP project. It signs in with your Google account and impersonates a service account, so there is no key file to keep safe (CI does the same through Workload Identity Federation).
 
 The generated CSVs are not in the repo (they're in `.gitignore`). The same `--seed` always produces the same data.
 
